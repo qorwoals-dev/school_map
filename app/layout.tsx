@@ -34,6 +34,11 @@ export default function RootLayout({
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossOrigin=""
         />
+        {/* 카카오 지도 & 로컬 검색 Places SDK */}
+        <script
+          type="text/javascript"
+          src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3b10b9c341a56dc74b6f17769b9daac3&libraries=services,clusterer&autoload=false"
+        />
       </head>
       <body className="antialiased selection:bg-[#ffd1da] selection:text-[#ff385c]">
         {children}

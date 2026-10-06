@@ -10,7 +10,7 @@ export function calculateDistance(
   lat2: number,
   lon2: number
 ): number {
-  const R = 6371e3; // 지구 반경 (미터)
+  const R = 6371e3;
   const phi1 = (lat1 * Math.PI) / 180;
   const phi2 = (lat2 * Math.PI) / 180;
   const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
@@ -123,46 +123,14 @@ export async function getPlaces(params: {
     }
   }
 
-  // Fallback 및 현재 위치 기반 추천 보강
-  if (places.length === 0 || schoolId === "CURRENT_LOCATION") {
+  // Fallback: 정밀 Mock 데이터 활용
+  if (places.length === 0) {
     let pool = MOCK_PLACES;
 
-    // 만약 '내 현재 위치 기준'이거나 특정 학교 데이터가 없는 경우,
-    // 현재 위도/경도(lat, lng) 반경 100m~700m 주위로 장소를 자연스럽게 배치
-    if (schoolId === "CURRENT_LOCATION") {
-      pool = MOCK_PLACES.map((p, idx) => {
-        const offsetLat = Math.sin(idx * 1.4 + 0.5) * 0.0035;
-        const offsetLng = Math.cos(idx * 1.4 + 0.5) * 0.0045;
-        const placeLat = +(lat + offsetLat).toFixed(6);
-        const placeLng = +(lng + offsetLng).toFixed(6);
-        return {
-          ...p,
-          id: `loc-${idx}-${p.id}`,
-          schoolId: "CURRENT_LOCATION",
-          lat: placeLat,
-          lng: placeLng,
-          address: `내 현재 위치 주변 반경 ${(idx + 1) * 80}m 내 상권`,
-          distanceMeters: calculateDistance(lat, lng, placeLat, placeLng),
-        };
-      });
-    } else if (schoolId) {
+    if (schoolId && schoolId !== "CURRENT_LOCATION") {
       const matchSchool = pool.filter((p) => p.schoolId === schoolId);
       if (matchSchool.length > 0) {
         pool = matchSchool;
-      } else {
-        // 다른 학교일 경우 중심 좌표 기준 배치
-        pool = MOCK_PLACES.map((p, idx) => {
-          const placeLat = +(lat + Math.sin(idx * 1.3) * 0.003).toFixed(6);
-          const placeLng = +(lng + Math.cos(idx * 1.3) * 0.0035).toFixed(6);
-          return {
-            ...p,
-            id: `sim-${schoolId}-${p.id}`,
-            schoolId,
-            lat: placeLat,
-            lng: placeLng,
-            distanceMeters: calculateDistance(lat, lng, placeLat, placeLng),
-          };
-        });
       }
     }
 
