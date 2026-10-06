@@ -1,0 +1,105 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import "tailwindcss";
+
+:root {
+  /* Airbnb Design System Tokens (DESIGN-airbnb.md) */
+  --rausch: #ff385c;
+  --rausch-active: #e00b41;
+  --rausch-disabled: #ffd1da;
+  --rausch-soft: #fff0f3;
+
+  --ink: #222222;
+  --body: #3f3f3f;
+  --muted: #6a6a6a;
+  --muted-soft: #929292;
+
+  --hairline: #dddddd;
+  --hairline-soft: #ebebeb;
+  --border-strong: #c1c1c1;
+
+  --canvas: #ffffff;
+  --surface-soft: #f7f7f7;
+  --surface-strong: #f2f2f2;
+  --surface-card: #ffffff;
+
+  --marker-food: #ff385c;
+  --marker-cafe: #8d5b4c;
+  --marker-night: #1e88e5;
+  --marker-budget: #008489;
+  --marker-group: #ff8f00;
+
+  --shadow-airbnb: rgba(0, 0, 0, 0.02) 0px 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 2px 6px 0px, rgba(0, 0, 0, 0.1) 0px 4px 8px 0px;
+  --shadow-float: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --shadow-pill: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--ink);
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+
+/* Hide scrollbar for clean chip strips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Airbnb Pill & Card Shadow Classes */
+.shadow-airbnb {
+  box-shadow: var(--shadow-airbnb);
+}
+.shadow-airbnb-float {
+  box-shadow: var(--shadow-float);
+}
+.shadow-airbnb-pill {
+  box-shadow: var(--shadow-pill);
+}
+
+/* Marker Pulse */
+@keyframes marker-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.08);
+  }
+}
+.animate-marker-bounce {
+  animation: marker-bounce 0.6s ease-in-out infinite;
+}
+
+/* Leaflet Container Default Height */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
