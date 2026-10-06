@@ -84,7 +84,7 @@ export async function getPlaces(params: {
   if (supabase) {
     try {
       let query = supabase.from("places").select("*");
-      if (schoolId) {
+      if (schoolId && schoolId !== "CURRENT_LOCATION") {
         query = query.eq("school_id", schoolId);
       }
       if (category !== "ALL") {
@@ -123,23 +123,46 @@ export async function getPlaces(params: {
     }
   }
 
-  // Fallback: MOCK_PLACES 활용
-  if (places.length === 0) {
+  // Fallback 및 현재 위치 기반 추천 보강
+  if (places.length === 0 || schoolId === "CURRENT_LOCATION") {
     let pool = MOCK_PLACES;
-    if (schoolId) {
+
+    // 만약 '내 현재 위치 기준'이거나 특정 학교 데이터가 없는 경우,
+    // 현재 위도/경도(lat, lng) 반경 100m~700m 주위로 장소를 자연스럽게 배치
+    if (schoolId === "CURRENT_LOCATION") {
+      pool = MOCK_PLACES.map((p, idx) => {
+        const offsetLat = Math.sin(idx * 1.4 + 0.5) * 0.0035;
+        const offsetLng = Math.cos(idx * 1.4 + 0.5) * 0.0045;
+        const placeLat = +(lat + offsetLat).toFixed(6);
+        const placeLng = +(lng + offsetLng).toFixed(6);
+        return {
+          ...p,
+          id: `loc-${idx}-${p.id}`,
+          schoolId: "CURRENT_LOCATION",
+          lat: placeLat,
+          lng: placeLng,
+          address: `내 현재 위치 주변 반경 ${(idx + 1) * 80}m 내 상권`,
+          distanceMeters: calculateDistance(lat, lng, placeLat, placeLng),
+        };
+      });
+    } else if (schoolId) {
       const matchSchool = pool.filter((p) => p.schoolId === schoolId);
-      // 만약 해당 학교 데이터가 아직 없다면 대표 데이터셋의 좌표를 중심 기준 상대거리로 시뮬레이션
       if (matchSchool.length > 0) {
         pool = matchSchool;
       } else {
-        // 다른 학교일 경우 중심 좌표 기준 가상 배치
-        pool = MOCK_PLACES.map((p, idx) => ({
-          ...p,
-          id: `sim-${schoolId}-${p.id}`,
-          schoolId,
-          lat: lat + (Math.sin(idx * 1.3) * 0.003),
-          lng: lng + (Math.cos(idx * 1.3) * 0.0035),
-        }));
+        // 다른 학교일 경우 중심 좌표 기준 배치
+        pool = MOCK_PLACES.map((p, idx) => {
+          const placeLat = +(lat + Math.sin(idx * 1.3) * 0.003).toFixed(6);
+          const placeLng = +(lng + Math.cos(idx * 1.3) * 0.0035).toFixed(6);
+          return {
+            ...p,
+            id: `sim-${schoolId}-${p.id}`,
+            schoolId,
+            lat: placeLat,
+            lng: placeLng,
+            distanceMeters: calculateDistance(lat, lng, placeLat, placeLng),
+          };
+        });
       }
     }
 

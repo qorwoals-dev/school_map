@@ -18,6 +18,8 @@ export default function MapPage() {
     setIsLoadingPlaces,
     setPreferences,
     viewMode,
+    isCurrentLocationMode,
+    currentLocation,
   } = useAppStore();
 
   // 1. 초기 온보딩 선호도 복원
@@ -28,17 +30,28 @@ export default function MapPage() {
     }
   }, [setPreferences]);
 
-  // 2. 학교나 필터 카테고리가 변경될 때 장소 API 호출
+  // 2. 학교, 현재 위치 모드, 필터 카테고리가 변경될 때 장소 API 호출
   useEffect(() => {
     let isCancelled = false;
 
     async function fetchPlacesData() {
       setIsLoadingPlaces(true);
+
+      const targetLat =
+        isCurrentLocationMode && currentLocation
+          ? currentLocation.lat
+          : activeSchool.lat;
+      const targetLng =
+        isCurrentLocationMode && currentLocation
+          ? currentLocation.lng
+          : activeSchool.lng;
+      const targetSchoolId = isCurrentLocationMode ? "CURRENT_LOCATION" : activeSchool.id;
+
       try {
         const queryParams = new URLSearchParams({
-          schoolId: activeSchool.id,
-          lat: activeSchool.lat.toString(),
-          lng: activeSchool.lng.toString(),
+          schoolId: targetSchoolId,
+          lat: targetLat.toString(),
+          lng: targetLng.toString(),
           category: activeCategory,
           radius: "1500",
         });
@@ -63,10 +76,17 @@ export default function MapPage() {
     return () => {
       isCancelled = true;
     };
-  }, [activeSchool, activeCategory, setPlaces, setIsLoadingPlaces]);
+  }, [
+    activeSchool,
+    activeCategory,
+    isCurrentLocationMode,
+    currentLocation,
+    setPlaces,
+    setIsLoadingPlaces,
+  ]);
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#ffffff] overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-[#ffffff] overflow-hidden select-none">
       {/* 1. 상단 글로벌 네비게이션 헤더 */}
       <Header />
 
@@ -74,7 +94,7 @@ export default function MapPage() {
       <FilterBar />
 
       {/* 3. 메인 콘텐츠 영역 (지도 + 리스트 바텀시트) */}
-      <main className="relative flex-1 w-full overflow-hidden flex">
+      <main className="relative flex-1 w-full h-[calc(100vh-105px)] overflow-hidden flex">
         {/* 데스크톱 및 모바일 지도 (목록 뷰 모드일 때는 모바일에서 숨김 처리) */}
         <div
           className={`relative flex-1 w-full h-full ${

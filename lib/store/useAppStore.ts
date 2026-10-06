@@ -33,6 +33,12 @@ interface AppState {
   isSchoolModalOpen: boolean;
   setIsSchoolModalOpen: (open: boolean) => void;
 
+  // 위치 모드 (학교 중심 vs 내 현재 GPS 위치)
+  isCurrentLocationMode: boolean;
+  setIsCurrentLocationMode: (mode: boolean) => void;
+  currentLocation: { lat: number; lng: number; label?: string } | null;
+  setCurrentLocation: (loc: { lat: number; lng: number; label?: string } | null) => void;
+
   // 북마크 (찜)
   bookmarks: string[];
   toggleBookmark: (placeId: string) => void;
@@ -78,6 +84,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   isSchoolModalOpen: false,
   setIsSchoolModalOpen: (isSchoolModalOpen) => set({ isSchoolModalOpen }),
+
+  isCurrentLocationMode: false,
+  setIsCurrentLocationMode: (isCurrentLocationMode) => set({ isCurrentLocationMode }),
+
+  currentLocation: null,
+  setCurrentLocation: (currentLocation) => set({ currentLocation }),
 
   bookmarks: [],
   toggleBookmark: (placeId: string) => {
