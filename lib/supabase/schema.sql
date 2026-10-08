@@ -104,3 +104,25 @@ CREATE POLICY "Public read for reviews" ON public.place_reviews FOR SELECT USING
 CREATE POLICY "Public insert for reviews" ON public.place_reviews FOR INSERT WITH CHECK (true);
 CREATE POLICY "User bookmark control" ON public.bookmarks FOR ALL USING (true);
 CREATE POLICY "User profile control" ON public.user_profiles FOR ALL USING (true);
+
+-- 6. 로그인 사용자 즐겨찾기 (migrations/001_user_bookmarks.sql 참고)
+CREATE TABLE IF NOT EXISTS public.user_bookmarks (
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  place_id TEXT NOT NULL,
+  place JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+  PRIMARY KEY (user_id, place_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_bookmarks_user_created
+  ON public.user_bookmarks (user_id, created_at DESC);
+
+ALTER TABLE public.user_bookmarks ENABLE ROW LEVEL SECURITY;
+
+-- 본인 즐겨찾기만 조회/추가/삭제 가능
+CREATE POLICY "Users read own bookmarks" ON public.user_bookmarks
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users insert own bookmarks" ON public.user_bookmarks
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users delete own bookmarks" ON public.user_bookmarks
+  FOR DELETE USING (auth.uid() = user_id);

@@ -50,7 +50,7 @@ export default function PlaceCard({ place, isCompact = false }: PlaceCardProps) 
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleBookmark(place.id);
+            toggleBookmark(place);
           }}
           className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#222222] shadow-sm transition-transform active:scale-90 hover:scale-105"
           title="찜하기"

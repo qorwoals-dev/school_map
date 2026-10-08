@@ -183,7 +183,7 @@ export default function PlaceDetailModal() {
         <div className="p-4 border-t border-[#ebebeb] bg-white flex items-center gap-2">
           {/* 찜하기 버튼 */}
           <button
-            onClick={() => toggleBookmark(selectedPlace.id)}
+            onClick={() => toggleBookmark(selectedPlace)}
             className="w-12 h-12 rounded-xl border border-[#dddddd] flex items-center justify-center flex-shrink-0 hover:bg-[#f7f7f7] transition-all"
             title="북마크"
           >

@@ -136,8 +136,9 @@ export default function Header() {
           </Link>
 
           {/* 북마크 카운터 */}
-          <div
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#dddddd] text-xs font-semibold text-[#222222]"
+          <Link
+            href="/mypage#bookmarks"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#dddddd] hover:bg-[#f7f7f7] text-xs font-semibold text-[#222222] transition-colors"
             title="찜한 장소 목록"
           >
             <Heart
@@ -146,7 +147,7 @@ export default function Header() {
               }`}
             />
             <span>{bookmarks.length}</span>
-          </div>
+          </Link>
 
           {/* GitHub 로그인 / 프로필 */}
           <AuthButton />

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
-import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useAppStore } from "@/lib/store/useAppStore";
 
 export function GithubIcon({ className }: { className?: string }) {
   return (
@@ -14,26 +15,11 @@ export function GithubIcon({ className }: { className?: string }) {
 }
 
 export default function AuthButton() {
-  const supabase = useMemo(() => createClient(), []);
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(supabase !== null);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setIsLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+  const user = useAppStore((s) => s.authUser);
+  const isLoading = useAppStore((s) => s.isAuthLoading);
 
   const handleLogin = async () => {
+    const supabase = createClient();
     if (!supabase) return;
     const next = window.location.pathname + window.location.search;
     await supabase.auth.signInWithOAuth({
@@ -43,15 +29,6 @@ export default function AuthButton() {
       },
     });
   };
-
-  const handleLogout = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    setUser(null);
-  };
-
-  // Supabase 환경 변수가 없으면 로그인 버튼을 숨긴다
-  if (!supabase) return null;
 
   if (isLoading) {
     return <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#f2f2f2] animate-pulse" />;
@@ -70,27 +47,31 @@ export default function AuthButton() {
     );
   }
 
-  const avatarUrl = user.user_metadata?.avatar_url as string | undefined;
-  const userName =
-    (user.user_metadata?.user_name as string | undefined) ||
-    (user.user_metadata?.name as string | undefined) ||
-    user.email;
+  const { avatarUrl, displayName } = getProfile(user);
 
   return (
-    <button
-      onClick={handleLogout}
-      className="group relative w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#dddddd] overflow-hidden flex items-center justify-center bg-[#f7f7f7] cursor-pointer"
-      title={`${userName} · 클릭하여 로그아웃`}
+    <Link
+      href="/mypage"
+      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#dddddd] overflow-hidden flex items-center justify-center bg-[#f7f7f7] hover:ring-2 hover:ring-[#ff385c]/30 transition-shadow"
+      title={`${displayName} · 내 정보`}
     >
       {avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatarUrl} alt={userName ?? "프로필"} className="w-full h-full object-cover" />
+        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
       ) : (
-        <span className="text-xs font-bold text-[#222222]">{userName?.[0]?.toUpperCase()}</span>
+        <span className="text-xs font-bold text-[#222222]">{displayName[0]?.toUpperCase()}</span>
       )}
-      <span className="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/50 text-white">
-        <LogOut className="w-3.5 h-3.5" />
-      </span>
-    </button>
+    </Link>
   );
+}
+
+// GitHub 메타데이터에서 표시용 프로필 정보를 꺼낸다
+export function getProfile(user: User) {
+  const meta = user.user_metadata ?? {};
+  const githubUsername = (meta.user_name as string | undefined) ?? (meta.preferred_username as string | undefined);
+  return {
+    avatarUrl: meta.avatar_url as string | undefined,
+    displayName: (meta.full_name as string | undefined) || (meta.name as string | undefined) || githubUsername || user.email || "사용자",
+    githubUsername,
+  };
 }

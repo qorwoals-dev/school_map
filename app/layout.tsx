@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import AuthSync from "@/components/common/AuthSync";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="ko">
       <head />
       <body className="antialiased selection:bg-[#ffd1da] selection:text-[#ff385c]">
+        <AuthSync />
         {children}
         {/* 카카오 지도 SDK */}
         <Script
