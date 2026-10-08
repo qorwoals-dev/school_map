@@ -96,8 +96,8 @@ export default function OnboardingPage() {
     // Supabase 및 LocalStorage 영속화
     await saveUserPreferences(prefs);
 
-    // 메인 지도로 이동
-    router.push("/map");
+    // 로그인 페이지로 이동
+    router.push("/login");
   };
 
   return (

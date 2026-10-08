@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,22 +27,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        {/* Leaflet CSS for Map Rendering */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossOrigin=""
-        />
-        {/* 카카오 지도 & 로컬 검색 Places SDK */}
-        <script
-          type="text/javascript"
-          src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3b10b9c341a56dc74b6f17769b9daac3&libraries=services,clusterer&autoload=false"
-        />
-      </head>
+      <head />
       <body className="antialiased selection:bg-[#ffd1da] selection:text-[#ff385c]">
         {children}
+        {/* 카카오 지도 SDK */}
+        <Script
+          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services,clusterer&autoload=false`}
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
