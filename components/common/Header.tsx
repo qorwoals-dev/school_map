@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useAppStore } from "@/lib/store/useAppStore";
 import { SlidersHorizontal, School as SchoolIcon, Heart, Compass, Locate, Check } from "lucide-react";
 import Link from "next/link";
+import AuthButton from "./AuthButton";
 
 export default function Header() {
   const {
@@ -146,6 +147,9 @@ export default function Header() {
             />
             <span>{bookmarks.length}</span>
           </div>
+
+          {/* GitHub 로그인 / 프로필 */}
+          <AuthButton />
         </div>
       </div>
     </header>
